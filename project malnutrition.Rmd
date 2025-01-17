@@ -1,0 +1,501 @@
+---
+title: "malnutrition project"
+author: "Group 13"
+date: "2024-02-13"
+output:
+  word_document: default
+  html_document: default
+---
+```{r}
+#setting the working directory
+setwd("C:/malnutrition")
+```
+
+```{r}
+#getting the working directory
+getwd()
+```
+
+```{r}
+#importing the dataset
+library(haven)
+data <- read_dta("KEKR8ADT/KEKR8AFL.DTA")
+View(data)
+```
+
+```{r}
+#code to display 1000 columns
+rstudioapi::writeRStudioPreference("data_viewer_max_columns", 1000L)
+```
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+#viewing the grouped ages of the respondents
+age_of_mother <- subset(data, select = c(v013))
+View(age_of_mother)
+
+```
+
+```{r}
+#the minimun grouped age of the respondent
+min(age_of_mother)
+```
+
+```{r}
+#the maximum grouped age of the respondents
+max(age_of_mother)
+```
+
+```{r}
+#creating a new variable agecat and labelling the categories
+data$agecat=NA
+data$agecat[age_of_mother==1]="15 t0 19"
+data$agecat[age_of_mother==2]="20 to 24"
+data$agecat[age_of_mother==3]="25 to 29"
+data$agecat[age_of_mother==4]="30 to 34"
+data$agecat[age_of_mother==5]="35 to 39"
+data$agecat[age_of_mother==6]="40 to 44"
+data$agecat[age_of_mother==7]="45 to 49"
+table(data$agecat)
+
+```
+
+```{r}
+#gender of child
+gender_of_child <- subset(data, select = c(b4))
+View(gender_of_child)
+```
+
+```{r}
+data$child_gender=NA
+data$child_gender[gender_of_child==1]="Male"
+data$child_gender[gender_of_child==2]="Female"
+table(data$child_gender)
+```
+
+```{r}
+#viewing the type of residence
+resident1 <- subset(data, select = c(v102))
+View(resident1)
+```
+
+```{r}
+#minimun code of residence
+min(resident1)
+```
+
+```{r}
+#maximum code of residence
+max(resident1)
+```
+
+```{r}
+#creating a new variable residence and then labelling the categories as rural and urban
+data$residence=NA
+data$residence[resident1==1]="rural"
+data$residence[resident1==2]="urban"
+table(data$residence)
+
+```
+
+```{r}
+education<-subset(data,select=c(v106))
+View(education)
+```
+
+```{r}
+max(education)
+```
+
+```{r}
+min(education)
+```
+
+```{r}
+#labelling level of education
+data$education_level=NA
+data$education_level[education==0]="No education"
+data$education_level[education==1]="Primary"
+data$education_level[education==2]="Secondary"
+data$education_level[education==3]="more than secondary"
+table(data$education_level)
+```
+
+```{r}
+wealth<-subset(data,select=c(v190))
+View(wealth)
+```
+
+```{r}
+max(wealth)
+```
+
+```{r}
+min(wealth)
+```
+
+```{r}
+#labelling wealth index
+data$wealth_index=NA
+data$wealth_index[wealth==1]="Lower"
+data$wealth_index[wealth==2]="Low"
+data$wealth_index[wealth==3]="Average"
+data$wealth_index[wealth==4]="High"
+data$wealth_index[wealth==5]="Higher"
+
+table(data$wealth_index)
+```
+
+```{r}
+marital<-subset(data,select=c(v501))
+View(marital)
+```
+
+```{r}
+max(marital)
+```
+
+```{r}
+min(marital)
+```
+
+```{r}
+#labelling marital status
+data$marital_status=NA
+data$marital_status[marital==0]="Single"
+data$marital_status[marital==1]="Separated"
+data$marital_status[marital==2]="Divorced"
+data$marital_status[marital==3]="Widowed"
+data$marital_status[marital==4]="Married"
+data$marital_status[marital==5]="Cohabiting"
+
+table(data$marital_status)
+```
+
+```{r}
+#Stunting variable
+stunted <- data[, "hw70", drop = FALSE]
+View(stunted)
+```
+
+
+```{r}
+missing_values <- sum(is.na(stunted))
+missing_values
+
+
+```
+
+```{r}
+# Calculate the mean of the non-missing values
+mean_stunted <- mean(stunted$hw70, na.rm = TRUE)
+
+# Replace missing values with the mean
+stunted$hw70[is.na(stunted$hw70)] <- mean_stunted
+View(stunted)
+```
+
+```{r}
+
+# Thresholds for stunting, -2 standard deviations and below for stunted
+threshold_stunted<- -2.0000
+
+# Recode stunting variable
+stunted <- ifelse(stunted < threshold_stunted, 1, 0)
+
+
+```
+
+
+```{r}
+#labelling the stunting variable
+data$stunting=NA
+data$stunting[stunted==0]="not stunted"
+data$stunting[stunted==1]="stunted"
+table(data$stunting)
+```
+```{r}
+#proportion of those stunted
+prop.table(table(data$stunting))*100
+```
+
+```{r}
+#wasting variable
+wasted<- data[, "hw72", drop = FALSE]
+View(wasted)
+```
+
+```{r}
+# Calculate the mean of the non-missing values
+mean_wasted <- mean(wasted$hw72, na.rm = TRUE)
+
+# Replace missing values with the mean
+wasted$hw72[is.na(wasted$hw72)] <- mean_wasted
+View(wasted)
+```
+
+```{r}
+# Thresholds for wasting, -2 standard deviations and below for wasted
+threshold_wasted<- -2.0000
+
+# Recode stunting variable
+wasted <- ifelse(wasted < threshold_wasted, 1, 0)
+```
+
+```{r}
+#labelling wasting variable
+data$wasting=NA
+data$wasting[wasted==0]="not wasted"
+data$wasting[wasted==1]="wasted"
+table(data$wasting)
+```
+
+
+```{r}
+#proportion of those wasted
+prop.table(table(data$wasting))*100
+```
+
+```{r}
+#underweight variable
+underweighted<- data[, "hw71", drop = FALSE]
+View(underweighted)
+```
+
+```{r}
+# Calculate the mean of the non-missing values
+mean_underweighted <- mean(underweighted$hw71, na.rm = TRUE)
+
+# Replacing missing values with the mean
+underweighted$hw71[is.na(underweighted$hw71)] <- mean_underweighted
+
+```
+
+```{r}
+# Thresholds for underweight, -2 standard deviations and below for underweight
+threshold_underweighted<- -2.0000
+
+# Recode stunting variable
+underweighted <- ifelse(underweighted < threshold_underweighted, 1, 0)
+```
+
+```{r}
+#labelling underweight variable
+data$underweight=NA
+data$underweight[underweighted==0]="not underweight"
+data$underweight[underweighted==1]="underweight"
+table(data$underweight)
+
+```
+
+```{r}
+#proportion of those underweight
+prop.table(table(data$underweight))*100
+```
+
+```{r}
+library(gtsummary)
+library(dplyr)
+# Creating a single grouping variable
+vr <- data %>%
+  select(child_gender,agecat,marital_status,wealth_index,education_level,stunting,wasting,underweight)
+
+
+
+# Selecting stunting
+vr_selected <- vr %>%
+  select(-wasting, -underweight)
+
+# Summarizing the data by stunting status
+tbl_summary(vr_selected,
+  by = stunting,
+  missing = 'no',
+  percent = 'row'
+) %>%
+add_overall() %>%
+modify_header(label ~ "**Factor**") %>%
+modify_spanning_header(c("stat_1", "stat_2") ~ "**Stunting Status**") %>%
+bold_labels() %>%
+modify_caption("***: Socio-economic factors affecting stunting prevalence***")
+
+```
+
+```{r}
+# Selecting wasting
+vr_selected <- vr %>%
+  select(-stunting, -underweight)
+
+# Summarizing the data by wasting status
+tbl_summary(vr_selected,
+  by = wasting,
+  missing = 'no',
+  percent = 'row'
+) %>%
+add_overall() %>%
+modify_header(label ~ "**Factor**") %>%
+modify_spanning_header(c("stat_1", "stat_2") ~ "**wasting status**") %>%
+bold_labels() %>%
+modify_caption("***: Socio-economic factors affecting wasting prevalence***")
+
+```
+
+```{r}
+# Selecting underweight
+vr_selected <- vr %>%
+  select(-stunting,-wasting)
+# Summarizing the data by underweight status
+tbl_summary(vr_selected,
+  by = underweight,
+  missing = 'no',
+  percent = 'row'
+) %>%
+add_overall() %>%
+modify_header(label ~ "**Factor**") %>%
+modify_spanning_header(c("stat_1", "stat_2") ~ "**underweight status**") %>%
+bold_labels() %>%
+modify_caption("***: Socio-economic factors affecting underweight prevalence***")
+
+```
+
+```{r}
+library(ggplot2)
+ggplot(data,aes(x=child_gender,fill=factor(stunting)))+geom_bar(position="stack")+labs(title="Prevalence of stunting by child's gender",x="child's gender",y="count",fill="Stunting status")
+```
+
+```{r}
+# Perform logistic regression
+logit_model <- glm(malnutrition ~ child_gender + agecat + marital_status + wealth_index + education_level, 
+                   data = data, family = "binomial")
+
+# Summary of logistic regression model
+summary(logit_model)
+
+```
+
+```{r}
+logit_model2 <- glm(malnutrition ~ child_gender + marital_status + wealth_index + education_level, 
+                   data = data, family = "binomial")
+summary(logit_model2)
+```
+```{r}
+theme_gtsummary_journal("jama")
+model_2<-logit_model2 %>%
+  tbl_regression(exponentiate=TRUE)
+model_2
+```
+
+```{r}
+library(gtsummary)
+theme_gtsummary_journal("jama")
+model_1<-logit_model %>%
+  tbl_regression(exponentiate=TRUE)
+model_1
+```
+
+```{r}
+# Combining 'stunting', 'wasting', and 'underweight' into a single variable 'malnutrition'
+data$malnutrition <- ifelse(stunted == 1 | wasted == 1 | underweighted == 1, 1, 0)
+
+# Checking the distribution of the 'malnutrition' variable
+table(data$malnutrition)
+```
+
+```{r}
+# Loading required libraries
+library(randomForest)
+
+# Splitting the data into training and testing sets (80% training, 20% testing)
+
+set.seed(123) # Set seed for reproducibility
+train_index <- sample(1:nrow(data), 0.8*nrow(data)) # 80% for training
+train_data <- data[train_index, ]
+test_data <- data[-train_index, ]
+
+# Defining the predictor variables (features) and the target variable
+predictor_vars <- c("child_gender", "agecat", "marital_status", "wealth_index", "education_level","residence")
+target_var <- "malnutrition"
+
+
+# Training the random forest model
+# Creating the model
+rf_model <- randomForest(formula = as.factor(train_data[[target_var]]) ~ .,
+                         data = train_data[predictor_vars],
+                         ntree = 1000)
+print(rf_model)
+# Making predictions on the test data
+predictions <- predict(rf_model, newdata = test_data[predictor_vars])
+# Evaluating the model
+confusion_matrix <- table(predictions, test_data$malnutrition)
+accuracy <- sum(diag(confusion_matrix)) / sum(confusion_matrix)
+
+# Print confusion matrix and accuracy
+print(confusion_matrix)
+print(paste("Accuracy:", accuracy))
+
+
+
+```
+
+```{r}
+# Calculating precision
+precision <- 14218 / (14218 + 330)
+
+# Calculating recall (sensitivity)
+recall <- 14218 / (14218 + 3)
+
+# Calculating F1-score
+f1_score <- 2 * (precision * recall) / (precision + recall)
+
+# Print the results
+print(precision)
+print(recall)
+print(f1_score)
+
+
+```
+
+
+```{r}
+# Load the pROC package
+library(pROC)
+
+# Get predicted probabilities for the positive class (malnutrition = 1)
+predicted_probs <- predict(rf_model, test_data[predictor_vars], type = "prob")[, 2]
+
+# Compute ROC curve
+roc_curve <- roc(ifelse(test_data[[target_var]] == 1, "malnutrition", "not malnutrition"), predicted_probs)
+
+# Plot ROC curve
+plot(roc_curve, main = "ROC Curve for Malnutrition Prediction", 
+     col = "blue", lwd = 2, print.auc = TRUE)
+
+# Add legend
+legend("bottomright", legend = paste("AUC =", round(auc(roc_curve), 2)), 
+       col = "blue", lwd = 2)
+
+```
+
+```{r}
+# Calculate precision and recall
+library(pROC)
+
+# Extract probabilities for the positive class from the random forest model
+probs <- predict(rf_model, test_data[predictor_vars], type = "prob")[, "1"]
+
+# Create a ROC object
+roc_obj <- roc(test_data[[target_var]], probs)
+
+# Calculate precision-recall curve points
+pr_curve <- coords(roc_obj, "best", best.method = "closest.topleft")
+
+# Plot precision-recall curve
+plot(pr_curve, main = "Precision-Recall Curve", col = "blue", lwd = 2, ylim = c(0, 1), xlim = c(0, 1))
+abline(h = seq(0, 1, by = 0.1), v = seq(0, 1, by = 0.1), col = "lightgray", lty = 3)
+
+```
+
+
+
