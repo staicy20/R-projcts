@@ -1,4 +1,4 @@
-##Modelling malnutrition in Children Under Five in Kenya - Data Analysis Using R
+## Modelling malnutrition in Children Under Five in Kenya - Data Analysis Using R
 
 This project explores the prevalence and contributing factors of malnutrition among children under five years old. Using R, the analysis investigates nutrition indicators, demographic variables, and socioeconomic factors to draw insights and support evidence-based decision-making.
 
