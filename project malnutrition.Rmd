@@ -1,6 +1,5 @@
 ---
 title: "malnutrition project"
-author: "Group 13"
 date: "2024-02-13"
 output:
   word_document: default
